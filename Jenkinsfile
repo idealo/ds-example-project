@@ -1,11 +1,12 @@
 pipeline {
-    agent any
+    agent {
+        node {label 'python'}
+    }
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh 'rm -rf /opt/conda/envs'
                 sh 'conda env create -n myapp -f src/python/project/environment.yml'
             }
         }
@@ -26,9 +27,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            cleanWs()
-        }
-    }
 }
