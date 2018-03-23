@@ -30,13 +30,19 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
-# Deploy application
+# Install dependencies via Anaconda
 RUN mkdir -p /deploy/app
-COPY src /deploy/app
-RUN conda env create -n myapp -f /deploy/app/python/project/environment.yml && rm -rf /opt/conda/pkgs/*
+COPY src/python/project/environment.yml /deploy/app/environment.yml
+RUN conda env create -n myapp -f /deploy/app/environment.yml && rm -rf /opt/conda/pkgs/*
 ENV PATH /opt/conda/envs/myapp/bin:$PATH
+
+# Deploy application
+COPY src/python/project /deploy/app
 WORKDIR /deploy/app
+
+# Set Python path
+ENV PYTHONPATH=/deploy
 
 EXPOSE 8080
 
-CMD ["python", "python/project/app.py"]
+CMD ["python", "app.py"]
