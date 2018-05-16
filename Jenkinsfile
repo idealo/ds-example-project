@@ -3,14 +3,22 @@ pipeline {
         node {label 'python'}
     }
 
+    triggers {
+        pollSCM('')
+    }
+
+    environment {
+        APPLICATION_NAME = 'ds-example-project'
+    }
+
     stages {
-        stage('Build') {
+        stage('Build Testing') {
             steps {
                 echo 'Building..'
                 sh 'conda env create -n myapp -f src/python/project/environment.yml'
             }
         }
-        stage('Test') {
+        stage('Test Application') {
             steps {
                 echo 'Testing..'
                 sh '''
@@ -19,12 +27,27 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy') {
+        stage('Build Application') {
             steps {
-                echo 'Deploying....'
-                sh 'oc start-build ds-example-project'
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject() {
+                            openshiftBuild(buildConfig: '${APPLICATION_NAME}', showBuildLogs: 'true')
+                        }
+                    }
+                }
+            }
+        }
+        stage('Deploy Application') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject() {
+                            openshiftDeploy(deploymentConfig: '${APPLICATION_NAME}')
+                        }
+                    }
+                }
             }
         }
     }
-
 }

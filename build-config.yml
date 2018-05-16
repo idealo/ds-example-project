@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: build-template
+objects:
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      labels:
+        app: ${APPLICATION_NAME}
+      name: ${APPLICATION_NAME}
+
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+        name: ${APPLICATION_NAME}
+    spec:
+      output:
+        to:
+          kind: ImageStreamTag
+          name: '${APPLICATION_NAME}:latest'
+      source:
+        git:
+          uri: ${GIT_URL}
+        sourceSecret:
+          name: bitbucket
+        type: Git
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Dockerfile
+      triggers:
+      - imageChange: {}
+      type: ImageChange
+
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      labels:
+        app: ${APPLICATION_NAME}
+      name: ${APPLICATION_NAME}-pipeline
+    spec:
+      source:
+        git:
+          ref: master
+          uri: ${GIT_URL}
+      strategy:
+        jenkinsPipelineStrategy:
+          jenkinsfilePath: Jenkinsfile
+        type: JenkinsPipeline
+
+parameters:
+  - name: APPLICATION_NAME
+    displayName: Application name
+    description: The name of the application
+  - name: GIT_URL
+    displayName: Git url
+    description: The url of the repo
