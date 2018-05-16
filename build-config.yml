@@ -24,8 +24,6 @@ objects:
       source:
         git:
           uri: ${GIT_URL}
-        sourceSecret:
-          name: bitbucket
         type: Git
       strategy:
         dockerStrategy:
