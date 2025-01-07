@@ -2,6 +2,8 @@
 
 This repository provides a simple Python web application using Anaconda as the package manager. It is intended to be used along Jenkins-CI which is deployed on OpenShift.
 
+This project is no longer actively maintained and has been archived on Jan 7, 2025.
+
 ## Getting Started
 
 See [jenkins-ci](https://github.com/idealo/jenkins-ci) repo
